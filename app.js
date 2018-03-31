@@ -82,7 +82,7 @@ app.get('/ideas/edit/:id', (req, res)=>{
     
 });
 
-//Process form
+//ADD: Process form
 app.post('/ideas', (req, res)=> {
     
     //Validation
