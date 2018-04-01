@@ -2,6 +2,8 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const session = require('express-session');
+const flash = require('connect-flash');
 const mongoose = require('mongoose');
 
 const app = express();
@@ -38,7 +40,25 @@ app.use(bodyParser.json());
 // express method-override middleware
 app.use(methodOverride('_method'));
 
+//Express-session middleware
+// app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+//  cookie: { secure: true }
+}))
 
+//Flash middleware
+app.use( flash() );
+
+//Global variables
+app.use((req, res, next)=>{
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    next();
+})
 
 //Index route
 app.get('/', (req, res)=>{
@@ -57,7 +77,7 @@ app.get('/about', (req, res)=> {
 //Idea index page
 app.get('/ideas', (req, res)=> {
     Idea.find({})
-        .sort({date:'asc'})
+        .sort({date:'desc'})
         .then(ideas => {
             res.render('ideas/index', {
                 ideas:ideas
@@ -65,7 +85,7 @@ app.get('/ideas', (req, res)=> {
         });
 });
 
-//Add Idea form
+//Add-Idea form
 app.get('/ideas/add', (req, res)=>{
     res.render('ideas/add')
 });
@@ -108,6 +128,7 @@ app.post('/ideas', (req, res)=> {
         new Idea(newUser)
             .save()
             .then(idea => {
+                req.flash('success_msg', 'Added Idea')
                 res.redirect('/ideas');
             })
     }
@@ -124,6 +145,7 @@ app.put('/ideas/:id', (req, res)=>{
         idea.details = req.body.details;
         
         idea.save().then(idea => {
+            req.flash('success_msg', 'Updated successfully!');
             res.redirect('/ideas');
         });
     });
@@ -133,6 +155,7 @@ app.put('/ideas/:id', (req, res)=>{
 //Delete ideas
 app.delete('/ideas/:id', (req, res)=>{
     Idea.remove({_id:req.params.id}).then(()=>{
+        req.flash('success_msg','Video idea removed');
         res.redirect('/ideas');
     });
 });
