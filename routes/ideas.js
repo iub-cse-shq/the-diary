@@ -63,7 +63,7 @@ router.post('/', (req, res)=> {
         new Idea(newUser)
             .save()
             .then(idea => {
-                req.flash('success_msg', 'Added Idea')
+                req.flash('success_msg', 'Added entry')
                 res.redirect('/ideas');
             })
     }
@@ -90,7 +90,7 @@ router.put('/:id', (req, res)=>{
 //Delete ideas
 router.delete('/:id', (req, res)=>{
     Idea.remove({_id:req.params.id}).then(()=>{
-        req.flash('success_msg','Video idea removed');
+        req.flash('success_msg','Entry removed!');
         res.redirect('/ideas');
     });
 });

@@ -86,7 +86,7 @@ app.use('/ideas', ideas);
 //specify default route for users
 app.use('/users', users);
 
-const port = 5000;
+const port = process.env.PORT;
 
 app.listen(port, ()=>{
     console.log(`server started on port ${port}`);
