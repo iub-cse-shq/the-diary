@@ -5,13 +5,20 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const flash = require('connect-flash');
+const passport = require('passport');
 const mongoose = require('mongoose');
 
 const app = express();
 
 //Load routes
-const ideas = require('./routes/ideas');
+const notes = require('./routes/notes');
 const users = require('./routes/users');
+
+//Passport Config
+require('./config/passport')(passport);
+
+// Map global promise - get rid of warning
+mongoose.Promise = global.Promise;
 
 //How to connect to mongoose
 mongoose.connect('mongodb://localhost/vidjot-dev')
@@ -22,12 +29,7 @@ mongoose.connect('mongodb://localhost/vidjot-dev')
 });
 
 
-//How middleware works
-// app.use((req, res, next)=>{
-//     //console.log(Date.now());
-//     req.name='Zoha';
-//     next();   
-// });
+
 
 //Handlebars Middleware
 app.engine('handlebars', exphbs({defaultLayout:'main'}) );
@@ -51,7 +53,11 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
 //  cookie: { secure: true }
-}))
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Flash middleware
 app.use( flash() );
@@ -61,6 +67,7 @@ app.use((req, res, next)=>{
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
     next();
 });
 
@@ -80,8 +87,8 @@ app.get('/about', (req, res)=> {
 
 
 
-//specify default route for ideas
-app.use('/ideas', ideas);
+//specify default route for notes
+app.use('/notes', notes);
 
 //specify default route for users
 app.use('/users', users);

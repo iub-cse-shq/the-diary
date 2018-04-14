@@ -4,15 +4,16 @@
 
 {{/each}}
 <div class="card card-body">
-    <h3>Daily Journal</h3>
-    <form action="/ideas" method="POST">
+    <h3>Edit journal entry</h3>
+    <form action="/notes/{{note.id}}?_method=PUT" method="POST">
+        <input type="hidden" name="_method" value="PUT">
         <div class="form-group">
             <label for="title">Title</label>
-            <input type="text" class="form-control" name="title" value="">
+            <input type="text" class="form-control" name="title" value="{{note.title}}">
         </div>
         <div class="form-group">
             <label for="details">Details</label>
-            <textarea class="form-control" name="details" value=""></textarea> 
+            <textarea class="form-control" name="details" value="">{{note.details}}</textarea> 
         </div>
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
